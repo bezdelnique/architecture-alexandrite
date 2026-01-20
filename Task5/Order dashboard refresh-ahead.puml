@@ -1,0 +1,25 @@
+@startuml
+
+participant "Компонент блока последние заказы" as dashboard_cmp order 30
+participant "Кэш" as cash order 40
+database БД as db order 50
+
+group Отображение блока последних заказов (Read-Through)
+dashboard_cmp -> cash++: Запрос последних заказов
+
+alt В кэше нет данных?
+cash -> db++ : Обновление последних заказов в кеше
+cash <-- db--
+end alt
+
+dashboard_cmp <-- cash--: Список последних заказов
+end group
+
+
+group Обновление кеша (Refresh-ahead)
+cash -> db++ : Обновление последних заказов в кеше
+cash <-- db--
+end group
+
+
+@enduml
